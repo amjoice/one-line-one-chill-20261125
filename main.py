@@ -30,29 +30,38 @@ specific and tight, but the scare is only a name, not a reversal.
 
 import os
 
-LINE = "The coroner called to say the body on his table had my fingerprints, my tattoo, and a heartbeat."
+LINE = " ".join([
+    "The coroner called to say the body on his table",
+    "had my fingerprints, my tattoo, and a heartbeat.",
+])
 
 MAX_CHARS = 200
 OUTPUT_PATH = "/output/entry.txt"
 
 
-def check_line(line: str) -> str:
+def check_line(candidate: str) -> str:
     """Return the line after enforcing the entry rules."""
-    text = line.strip()
-    if not text:
+    cleaned = candidate.strip()
+    if not cleaned:
         raise ValueError("entry must not be empty")
-    if len(text) > MAX_CHARS:
-        raise ValueError(f"entry is {len(text)} chars, limit is {MAX_CHARS}")
-    if "\n" in text or "\r" in text:
+    if len(cleaned) > MAX_CHARS:
+        raise ValueError(f"entry is {len(cleaned)} chars, limit is {MAX_CHARS}")
+    if "\n" in cleaned or "\r" in cleaned:
         raise ValueError("entry must be a single line")
-    return text
+    return cleaned
+
+
+def write_entry(text: str) -> None:
+    """Write the validated line to the output path."""
+    out_dir = os.path.dirname(OUTPUT_PATH)
+    os.makedirs(out_dir, exist_ok=True)
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as handle:
+        handle.write(text)
 
 
 def main() -> None:
-    line = check_line(LINE)
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
-        f.write(line)
+    entry = check_line(LINE)
+    write_entry(entry)
 
 
 if __name__ == "__main__":
